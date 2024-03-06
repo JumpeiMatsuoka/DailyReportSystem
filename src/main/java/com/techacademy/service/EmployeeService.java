@@ -31,7 +31,7 @@ public class EmployeeService {
     @Transactional
     public ErrorKinds save(Employee employee) {
 
-        // パスワードチェック
+     // パスワードチェック
         ErrorKinds result = employeePasswordCheck(employee);
         if (ErrorKinds.CHECK_OK != result) {
             return result;
@@ -54,7 +54,7 @@ public class EmployeeService {
 
     @Transactional
     public ErrorKinds update(Employee employee) {
-     // 氏名の必須チェック
+        // 氏名の必須チェック
         if (employee.getName() == null || employee.getName().isEmpty()) {
             return ErrorKinds.NAME_REQUIRED;
         }
@@ -62,34 +62,29 @@ public class EmployeeService {
         if (employee.getName().length() > 20) {
             return ErrorKinds.NAME_LENGTH_ERROR;
         }
-        Optional<Employee> existingEmployee = employeeRepository.findById(employee.getCode());
-        if (!existingEmployee.isPresent()) {
+        Optional<Employee> existingEmployeeOpt = employeeRepository.findById(employee.getCode());
+        if (!existingEmployeeOpt.isPresent()) {
             return ErrorKinds.NOT_FOUND_ERROR; // 従業員が見つからなければエラーを返す
         }
 
-        Employee savedEmployee = existingEmployee.get();
+        Employee existingEmployee = existingEmployeeOpt.get();
 
-     // パスワードのチェック（空でない場合のみ）
+        // パスワードが空でない場合のみチェックして更新
         if (employee.getPassword() != null && !employee.getPassword().isEmpty()) {
-            // パスワードの桁数チェック
-            if (employee.getPassword().length() < 8 || employee.getPassword().length() > 16) {
-                return ErrorKinds.PASSWORD_LENGTH_ERROR;
+            ErrorKinds passwordResult = employeePasswordCheck(employee);
+            if (passwordResult != ErrorKinds.CHECK_OK) {
+                return passwordResult;
             }
-            // パスワードの形式チェック
-            if (!employee.getPassword().matches("^[A-Za-z0-9]+$")) {
-                return ErrorKinds.PASSWORD_FORMAT_ERROR;
-            }
-            // パスワードをエンコードして設定
-            savedEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));
+            existingEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));
+        } else {
+            // パスワードが空の場合、既存のパスワードをそのまま使用する（更新処理からパスワード更新を除外）
         }
+        // ここでパスワードが空の場合でも、その他の情報は更新される
+        existingEmployee.setName(employee.getName());
+        existingEmployee.setRole(employee.getRole());
+        existingEmployee.setUpdatedAt(LocalDateTime.now());
 
-        // 他の情報（名前、権限など）を常に更新
-        savedEmployee.setName(employee.getName());
-        savedEmployee.setRole(employee.getRole());
-        // 必要に応じて他のフィールドも更新
-        savedEmployee.setUpdatedAt(LocalDateTime.now());
-
-        employeeRepository.save(savedEmployee); // 更新処理を実行
+        employeeRepository.save(existingEmployee); // 更新処理を実行
         return ErrorKinds.SUCCESS; // 更新に成功したらSUCCESSを返す
     }
 
@@ -123,15 +118,12 @@ public class EmployeeService {
         return employee;
     }
 
-    
     // 従業員パスワードチェック
     private ErrorKinds employeePasswordCheck(Employee employee) {
-        // パスワードが空の場合はチェックをスキップ
-        if (employee.getPassword() == null || employee.getPassword().isEmpty()) {
-            return ErrorKinds.CHECK_OK;
-        }
+
         // 従業員パスワードの半角英数字チェック処理
         if (isHalfSizeCheckError(employee)) {
+
             return ErrorKinds.HALFSIZE_ERROR;
         }
 
@@ -156,7 +148,7 @@ public class EmployeeService {
     }
 
     // 従業員パスワードの8文字～16文字チェック処理
-    private boolean isOutOfRangePassword(Employee employee) {
+    public boolean isOutOfRangePassword(Employee employee) {
 
         // 桁数チェック
         int passwordLength = employee.getPassword().length();

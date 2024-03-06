@@ -29,12 +29,12 @@
                                     <div class="mb-3">
                                         <label class="form-label" for="name">氏名</label>
                                         <input class="form-control" type="text" th:field="*{name}" id="name">
-                                        <span th:errors="*{name}" class="text-danger"></span>
+                                        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger"></span>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="password">パスワード</label>
                                         <input class="form-control" type="password" th:field="*{password}" id="password">
-                                        <span th:errors="*{password}" class="text-danger"></span>
+                                        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"  class="text-danger"></span>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="role">権限</label>
