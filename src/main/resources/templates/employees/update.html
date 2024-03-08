@@ -13,7 +13,7 @@
             <!-- コンテンツ -->
             <div class="container-fluid p-0">
                 <h1 class="h3 mb-3">従業員 更新</h1>
-                <p class="mb-3">パスワードは更新する場合のみ入力してください</p>
+                <p class="mb-3" style="background-color:#d3d3d3;">パスワードは更新する場合のみ入力してください</p>
             </div>
             <div class="col-12 col-xxl-6">
                 <div class="col-xl-12">
@@ -32,6 +32,7 @@
                                         <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger"></span>
                                     </div>
                                     <div class="mb-3">
+                                    <label class="form-label" for="name">パスワード</label>
                                             <input class="form-control" type="password" th:field="*{password}" th:errorclass="err" id="password">
                                             <span th:if="${errorMessage} neq null" th:text="${errorMessage}" class="text-danger"></span>
                                         </div>
@@ -42,10 +43,9 @@
                                                 <option value="ADMIN">管理者</option>
                                             </select>
                                      </div>
-
                                 <div class="mb-3">
                                     <input type="submit" value="更新" class="btn btn-primary">
-                                    <a th:href="@{/employees}" class="btn btn-secondary">戻る</a>
+                                    <a th:href="@{/employees}" class="btn btn-primary">戻る</a>
                                 </div>
                                 </div>
                             </form>

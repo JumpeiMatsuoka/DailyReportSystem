@@ -15,7 +15,12 @@
                         <tr>
                         　　<th>氏名</th>
                             <th>日付</th>
-                            <th>タイトル</th>                     <tbody>
+                            <th>タイトル</th>
+                     <tbody>
+                      　<tr th:each="report:${reportsList}">
+                        <td class="align-middle" th:text="${report.title}"></td>
+                        </tr>
+                     </tbody>
                 </table>
             </div>
             <div>

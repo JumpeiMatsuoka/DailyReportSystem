@@ -93,7 +93,7 @@ public class EmployeeService {
 
         // 自分を削除しようとした場合はエラーメッセージを表示
         if (code.equals(userDetail.getEmployee().getCode())) {
-            return ErrorKinds.RANGECHECK_ERROR;
+            return ErrorKinds.LOGINCHECK_ERROR;
         }
         Employee employee = findByCode(code);
         LocalDateTime now = LocalDateTime.now();
