@@ -33,7 +33,7 @@
                                     </div>
                                     <div class="mb-3">
                                             <input class="form-control" type="password" th:field="*{password}" th:errorclass="err" id="password">
-                                            <span th:if="${passwordError} neq null" th:text="${passwordError}" class="text-danger"></span>
+                                            <span th:if="${errorMessage} neq null" th:text="${errorMessage}" class="text-danger"></span>
                                         </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="role">権限</label>
