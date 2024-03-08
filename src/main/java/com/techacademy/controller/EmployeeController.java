@@ -1,7 +1,6 @@
 package com.techacademy.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +16,6 @@ import com.techacademy.constants.ErrorMessage;
 
 import com.techacademy.entity.Employee;
 import com.techacademy.service.EmployeeService;
-import com.techacademy.service.UserDetail;
 
 @Controller
 @RequestMapping("employees")
@@ -79,35 +77,4 @@ public class EmployeeController {
 
         return "employees/new";
     }
-
-    // 従業員新規登録処理
-    @PostMapping(value = "/add")
-    public String add(@Validated Employee employee, BindingResult res, Model model) {
-        if (res.hasErrors()) {
-            return "employees/add";
-        }
-
-        ErrorKinds result = employeeService.save(employee);
-        if (ErrorMessage.contains(result)) {
-                        model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-                        return create(employee);
-        }
-        return "redirect:/employees";
-        }
-
-    // 従業員削除処理
-    @PostMapping(value = "/{code}/delete")
-    public String delete(@PathVariable String code, @AuthenticationPrincipal UserDetail userDetail, Model model) {
-
-        ErrorKinds result = employeeService.delete(code, userDetail);
-
-        if (ErrorMessage.contains(result)) {
-            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-            model.addAttribute("employee", employeeService.findByCode(code));
-            return detail(code, model);
-        }
-
-        return "redirect:/employees";
-    }
-
 }

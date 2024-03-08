@@ -3,10 +3,16 @@
         <span class="text-light p-1">日報管理システム</span>
     </a>
     <ul class="mt-3 mb-5">
+        <!-- 既存の従業員リンク -->
         <li sec:authorize="hasAuthority('ADMIN')">
             <a class="text-light" th:href="@{/employees}">従業員</a>
         </li>
+        <!-- 日報一覧へのリンク -->
+        <li sec:authorize="isAuthenticated()">
+            <a class="text-light" th:href="@{/daily-reports}">日報</a>
+        </li>
     </ul>
+    <!-- ログアウトフォーム -->
     <form method="post" th:action="@{/logout}">
         <div class="p-1">
             <input type="submit" value="ログアウト" class="btn btn-light">

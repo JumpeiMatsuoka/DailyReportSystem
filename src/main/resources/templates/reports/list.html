@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html class="h-100" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="common/header :: head_fragment(title='日報 一覧')"></head>
+
+<body class="h-100 overflow-hidden">
+    <div class="row h-100">
+    <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <nav th:replace="common/side :: copy"></nav>
+            <h2>日報 一覧</h2>
+            <div th:if="${!reportsList.isEmpty()}">
+                <!-- 日報情報の一覧表示 -->
+                <table class="table">
+                    <thead>
+                        <tr>
+                        　　<th>氏名</th>
+                            <th>日付</th>
+                            <th>タイトル</th>                     <tbody>
+                </table>
+            </div>
+            <div>
+                <!-- 件数表示 -->
+                <p th:text="'全' + ${listSize} + '件'"></p>
+            </div>
+            <div>
+                <!-- 新規登録画面への遷移ボタン -->
+                <a th:href="@{/report/add}" class="btn btn-primary">登録</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

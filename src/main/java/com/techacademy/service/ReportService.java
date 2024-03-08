@@ -16,13 +16,13 @@ import com.techacademy.repository.EmployeeRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class EmployeeService {
+public class ReportService {
 
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
+    public ReportService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
         this.passwordEncoder = passwordEncoder;
     }
