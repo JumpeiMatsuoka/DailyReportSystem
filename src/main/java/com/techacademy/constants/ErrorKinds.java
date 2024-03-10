@@ -1,26 +1,44 @@
 package com.techacademy.constants;
 
-// エラーメッセージ定義
+//エラーメッセージ定義
 public enum ErrorKinds {
 
-    // エラー内容
-    // 空白チェックエラー
-    BLANK_ERROR,
-    // 半角英数字チェックエラー
-    HALFSIZE_ERROR,
-    // 桁数(8桁~16桁以外)チェックエラー
-    RANGECHECK_ERROR,
-    // 重複チェックエラー(例外あり)
-    DUPLICATE_EXCEPTION_ERROR,
-    // 重複チェックエラー(例外なし)
-    DUPLICATE_ERROR,
-    // ログイン中削除チェックエラー
-    LOGINCHECK_ERROR,
-    // 日付チェックエラー
-    DATECHECK_ERROR,
-    // チェックOK
-    CHECK_OK,
-    // 正常終了
-    SUCCESS, NOT_FOUND_ERROR, NAME_REQUIRED, NAME_LENGTH_ERROR, PASSWORD_LENGTH_ERROR, PASSWORD_FORMAT_ERROR;
+ // エラー内容
+ // 空白チェックエラー
+ BLANK_ERROR("値を入力してください"),
+ // 半角英数字チェックエラー
+ HALFSIZE_ERROR("パスワードは半角英数字のみで入力してください"),
+ // 桁数(8桁~16桁以外)チェックエラー
+ RANGECHECK_ERROR("8文字以上16文字以下で入力してください"),
+ // 重複チェックエラー(例外あり)
+ DUPLICATE_EXCEPTION_ERROR("既に登録されている社員番号です"),
+ // 重複チェックエラー(例外なし)
+ DUPLICATE_ERROR("既に登録されている社員番号です"),
+ // ログイン中削除チェックエラー
+ LOGINCHECK_ERROR("ログイン中の従業員を削除することは出来ません"),
+ // 日付チェックエラー
+ DATECHECK_ERROR("既に登録されている日付です"),
+ // チェックOK
+ CHECK_OK("チェックOK"),
+ // 正常終了
+ SUCCESS("正常終了"),
+ NOT_FOUND_ERROR("従業員が見つかりません"),
+ NAME_REQUIRED("氏名は必須です"),
+ NAME_LENGTH_ERROR("氏名は20文字以下で入力してください"),
+ PASSWORD_LENGTH_ERROR("パスワードは8文字以上16文字以下で入力してください"),
+ PASSWORD_FORMAT_ERROR("パスワードは半角英数字のみで入力してください"),
+ NOT_FOUND("見つかりません");
 
+ // エラーメッセージ
+ private final String message;
+
+ // コンストラクタ
+ private ErrorKinds(String message) {
+     this.message = message;
+ }
+
+ // エラーメッセージの取得
+ public String getMessage() {
+     return message;
+ }
 }

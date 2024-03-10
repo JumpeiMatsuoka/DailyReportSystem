@@ -5,33 +5,54 @@
 
 <body class="h-100 overflow-hidden">
     <div class="row h-100">
-    <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <nav th:replace="common/side :: copy"></nav>
-            <h2>日報 一覧</h2>
-            <div th:if="${!reportsList.isEmpty()}">
-                <!-- 日報情報の一覧表示 -->
-                <table class="table">
-                    <thead>
-                        <tr>
-                        　　<th>氏名</th>
-                            <th>日付</th>
-                            <th>タイトル</th>
-                     <tbody>
-                      　<tr th:each="report:${reportsList}">
-                        <td class="align-middle" th:text="${report.title}"></td>
-                        </tr>
-                     </tbody>
-                </table>
-            </div>
-            <div>
-                <!-- 件数表示 -->
-                <p th:text="'全' + ${listSize} + '件'"></p>
-            </div>
-            <div>
-                <!-- 新規登録画面への遷移ボタン -->
-                <a th:href="@{/report/add}" class="btn btn-primary">登録</a>
+        <div class="h-100 p-3 mb-2 bg-dark text-white col-sm-2">
+            <!-- サイドバー -->
+            <nav th:replace="common/side :: copy"></nav>
+        </div>
+        <div class="mt-3 h-100 col-sm-10">
+            <!-- コンテンツ -->
+            <div class="container-fluid p-0">
+                <h1 class="h3 mb-3">日報 一覧</h1>
+                <!-- 日報情報のテーブル -->
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="table table-striped w-100">
+                                    <thead>
+                                        <tr>
+                                            <th>氏名</th>
+                                            <th>日付</th>
+                                            <th>タイトル</th>
+                                            <th></th> <!-- 操作カラム用のヘッダー -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="report : ${rl}">
+                                            <td class="align-middle" th:text="${report.employee.code}"></td>
+                                            <td class="align-middle"
+                                                th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd')}"></td>
+                                            <td class="align-middle" th:text="${report.title}"></td>
+                                            <td class="align-middle">
+                                                <!-- 詳細画面へのリンクボタン -->
+                                                <a th:href="@{/reports/{id}/detail(id=${report.id})}"
+                                                    class="btn btn-primary">詳細</a>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                                <!-- 件数表示 -->
+                                <p th:text="'全' + ${totalReports} + '件'"></p>
+                            </div>
+                        </div>
+                        <!-- 新規登録画面へのリンク -->
+                        <a th:href="@{/reports/add}" class="btn btn-primary">登録</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>

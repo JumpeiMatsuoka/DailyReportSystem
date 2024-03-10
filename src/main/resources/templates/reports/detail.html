@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html class="h-100" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="common/header :: head_fragment(title='日報詳細')"></head>
+
+<body class="h-100 overflow-hidden">
+    <div class="row h-100">
+        <div class="h-100 p-3 mb-2 bg-dark text-white col-sm-2">
+            <!-- サイドバー -->
+            <nav th:replace="common/side :: copy"></nav>
+        </div>
+        <div class="mt-3 h-100 col-sm-10">
+            <!-- コンテンツ -->
+            <div class="container-fluid p-0">
+                <h1 class="h3 mb-3">日報 詳細</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th class="table-active">日付</th>
+                                        <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd')}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="table-active">氏名</th>
+                                            <td th:text="${report.employee.name}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="table-active">タイトル</th>
+                                            <td th:text="${report.title}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="table-active">内容</th>
+                                            <td th:text="${report.content}"></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="table-active">登録日時</th>
+                                            <td th:text="${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm:ss')}">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="table-active">更新日時</th>
+                                            <td th:text="${#temporals.format(report.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">
+                                            </td>
+                                        </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-start">
+                            <a th:href="@{/reports/{id}/update(id=${report.id})}" class="btn btn-primary me-1">更新</a>
+                            <form th:action="@{/reports/{id}/delete(id=${report.id})}" method="post" class="d-inline">
+                                <input type="submit" value="削除" class="btn btn-primary me-1" />
+                            </form>
+                            <a th:href="@{/reports}" class="btn btn-primary">戻る</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
