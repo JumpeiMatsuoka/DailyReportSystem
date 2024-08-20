@@ -34,7 +34,6 @@ public class EmployeeController {
     // 従業員一覧画面
     @GetMapping
     public String list(Model model) {
-
         model.addAttribute("listSize", employeeService.findAll().size());
         model.addAttribute("employeeList", employeeService.findAll());
 

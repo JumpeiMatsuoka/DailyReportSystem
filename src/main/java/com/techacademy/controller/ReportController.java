@@ -1,22 +1,26 @@
 package com.techacademy.controller;
 
 import com.techacademy.constants.ErrorKinds;
+import com.techacademy.constants.ErrorMessage;
 import com.techacademy.entity.Report;
 import com.techacademy.service.ReportService;
 import com.techacademy.service.UserDetail;
-
 import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/reports")
@@ -31,9 +35,24 @@ public class ReportController {
 
     // 日報一覧表示
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("rl", reportService.findAll());
-        model.addAttribute("totalReports", reportService.findAll().size());
+    public String list(@AuthenticationPrincipal UserDetail userDetail, Model model) {
+        List<Report> reports;
+        if (userDetail == null) {
+            return "redirect:/login";
+        }
+
+        List<String> roles = userDetail.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        if (roles.contains("ROLE_ADMIN")) {
+            reports = reportService.findAllActive();
+        } else {
+            reports = reportService.findAllActiveByEmployee(userDetail.getEmployee());
+        }
+
+        model.addAttribute("listSize", reports.size());
+        model.addAttribute("rL", reports);
         return "reports/list";
     }
 
@@ -48,15 +67,28 @@ public class ReportController {
 
     // 日報新規登録処理
     @PostMapping("/add")
-    public String create(@Valid @ModelAttribute("report") Report report, BindingResult bindingResult, Model model) {
+    public String create(@AuthenticationPrincipal UserDetail userDetail, @Valid @ModelAttribute("report") Report report, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+            report.setEmployee(userDetail.getEmployee());
+            bindingResult.getFieldErrors().forEach(error -> {
+                ErrorKinds errorKind = determineErrorKind(error);
+                if (ErrorMessage.contains(errorKind)) {
+                    model.addAttribute(ErrorMessage.getErrorName(errorKind), ErrorMessage.getErrorValue(errorKind));
+                }
+            });
+            model.addAttribute("report", report);
             return "reports/new";
         }
-        ErrorKinds result = reportService.save(report);
-        if (result != ErrorKinds.SUCCESS) {
-            model.addAttribute("errorMessage", result.getMessage());
+
+        if (reportService.isDuplicateReportDate(userDetail.getEmployee(), report.getReportDate(), null)) {
+            model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DATECHECK_ERROR), ErrorMessage.getErrorValue(ErrorKinds.DATECHECK_ERROR));
+            report.setEmployee(userDetail.getEmployee());
+            model.addAttribute("report", report);
             return "reports/new";
         }
+
+        report.setEmployee(userDetail.getEmployee());
+        reportService.save(report);
         return "redirect:/reports";
     }
 
@@ -76,18 +108,28 @@ public class ReportController {
 
     // 日報更新処理
     @PostMapping("/{id}/update")
-    public String update(@Valid @ModelAttribute("report") Report report, BindingResult bindingResult, @PathVariable Long id, Model model) {
+    public String update(@Valid @ModelAttribute("report") Report report, BindingResult bindingResult, @PathVariable Long id, @AuthenticationPrincipal UserDetail userDetail, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("errorMessage", "入力内容に誤りがあります。");
+            report.setEmployee(userDetail.getEmployee());
+            bindingResult.getFieldErrors().forEach(error -> {
+                ErrorKinds errorKind = determineErrorKind(error);
+                if (ErrorMessage.contains(errorKind)) {
+                    model.addAttribute(ErrorMessage.getErrorName(errorKind), ErrorMessage.getErrorValue(errorKind));
+                }
+            });
             model.addAttribute("report", report);
             return "reports/update";
         }
-        report.setId(id); // 更新対象のIDを設定
-        ErrorKinds result = reportService.save(report);
-        if (result != ErrorKinds.SUCCESS) {
-            model.addAttribute("errorMessage", result.getMessage());
+
+        if (reportService.existsByEmployeeAndDate(userDetail.getEmployee(), report.getReportDate(), id)) {
+            model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DATECHECK_ERROR), ErrorMessage.getErrorValue(ErrorKinds.DATECHECK_ERROR));
+            report.setEmployee(userDetail.getEmployee());
+            model.addAttribute("report", report);
             return "reports/update";
         }
+
+        report.setId(id);
+        reportService.save(report);
         return "redirect:/reports";
     }
 
@@ -96,5 +138,32 @@ public class ReportController {
     public String delete(@PathVariable Long id) {
         reportService.delete(id);
         return "redirect:/reports";
+    }
+
+    private ErrorKinds determineErrorKind(FieldError error) {
+        switch (error.getField()) {
+            case "reportDate":
+                if (error.getCode().equals("NotBlank")) {
+                    return ErrorKinds.REPORT_DATE_BLANK_ERROR;
+                }
+                break;
+            case "title":
+                if (error.getCode().equals("NotBlank")) {
+                    return ErrorKinds.REPORT_TITLE_BLANK_ERROR;
+                } else if (error.getCode().equals("Size")) {
+                    return ErrorKinds.REPORT_TITLE_SIZE_ERROR;
+                }
+                break;
+            case "content":
+                if (error.getCode().equals("NotBlank")) {
+                    return ErrorKinds.REPORT_CONTENT_BLANK_ERROR;
+                } else if (error.getCode().equals("Size")) {
+                    return ErrorKinds.REPORT_CONTENT_SIZE_ERROR;
+                }
+                break;
+            default:
+                return null;
+        }
+        return null;
     }
 }

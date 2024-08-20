@@ -1,45 +1,58 @@
 <!DOCTYPE html>
 <html class="h-100" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="common/header :: head_fragment(title='日報 新規登録')"></head>
+
+<head th:replace="common/header :: head_fragment(title='日報 新規登録')">
+</head>
+
 <body class="h-100 overflow-hidden">
-<div class="row h-100">
-    <div class="h-100 p-3 mb-2 bg-dark text-white col-sm-2">
-        <!-- サイドバー -->
-        <nav th:replace="common/side :: copy"></nav>
-    </div>
-    <div class="mt-3 h-100 col-sm-10">
-        <!-- コンテンツ -->
-        <div class="container-fluid p-0">
-            <h1 class="h3 mb-3">日報 新規登録</h1>
-            <div class="card">
-                <div class="card-body">
-                    <!-- 日報登録フォーム -->
-                    <form th:action="@{/reports/add}" th:object="${report}" method="post">
-                        <div class="mb-3">
-                            <label for="date" class="form-label">日付</label>
-                            <input type="date" id="date" class="form-control" th:field="*{reportDate}" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('reportDate')}" th:errors="*{reportDate}"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="title" class="form-label">タイトル</label>
-                            <input type="text" id="title" class="form-control" th:field="*{title}" maxlength="100" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="content" class="form-label">内容</label>
-                            <textarea id="content" class="form-control" th:field="*{content}" rows="5" maxlength="600" required></textarea>
-                            <div class="text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
-                        </div>
-                        <!-- ボタン -->
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                            <button type="submit" class="btn btn-primary">登録</button>
-                            <a th:href="@{/reports}" class="btn btn-primary">戻る</a>
-                        </div>
-                    </form>
+    <div class="row h-100">
+        <div class="h-100 p-3 mb-2 bg-dark text-white col-sm-2">
+            <!-- サイドバー -->
+            <nav th:replace="common/side :: copy"></nav>
+        </div>
+        <div class="mt-3 h-100 col-sm-8">
+            <div class="container-fluid p-0">
+                <h1 class="h3 mb-3">日報 新規登録</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <!-- 日報登録フォーム -->
+                        <form th:action="@{/reports/add}" th:object="${report}" method="post">
+                            <div class="form-group">
+                                <label for="reportDate" class="form-label">日付</label>
+                                <div class="col-md-4">
+                                    <input type="date" id="reportDate" class="form-control date-input" th:field="*{reportDate}">
+                                    <div class="text-danger" th:if="${#fields.hasErrors('reportDate')}" th:errors="*{reportDate}"></div>
+                                    <div class="text-danger" th:if="${reportDateError != null}" th:text="${reportDateError}"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="employeeName" class="form-label">氏名</label>
+                                <span id="employeeName" class="form-control-plaintext" th:text="${report.employee != null ? report.employee.name : ''}"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="title" class="form-label">タイトル</label>
+                                <div class="col-md-6">
+                                    <input type="text" id="title" class="form-control title-input" th:field="*{title}" maxlength="200">
+                                    <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                                    <div class="text-danger" th:if="${titleError != null}" th:text="${titleError}"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="content" class="form-label">内容</label>
+                                <textarea id="content" class="form-control" th:field="*{content}" rows="5" maxlength="800"></textarea>
+                                <div class="text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+                                <div class="text-danger" th:if="${contentError != null}" th:text="${contentError}"></div>
+                            </div>
+                            <div class="btn-container mt-3">
+                                <button type="submit" class="btn btn-primary">登録</button>
+                                <a th:href="@{/reports}" class="btn btn-primary">戻る</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
+
 </html>

@@ -28,20 +28,26 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="name">氏名</label>
+                                        <div class="col-md-6">
                                         <input class="form-control" type="text" th:field="*{name}" id="name">
                                         <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger"></span>
+                                        </div>
                                     </div>
                                     <div class="mb-3">
                                     <label class="form-label" for="name">パスワード</label>
+                                    <div class="col-md-6">
                                             <input class="form-control" type="password" th:field="*{password}" th:errorclass="err" id="password">
                                             <span th:if="${errorMessage} neq null" th:text="${errorMessage}" class="text-danger"></span>
+                                    </div>
                                         </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="role">権限</label>
+                                        <div class="col-md-4">
                                         <select class="form-select" th:field="*{role}" id="role">
                                                 <option value="GENERAL">一般</option>
                                                 <option value="ADMIN">管理者</option>
                                             </select>
+                                        </div>
                                      </div>
                                 <div class="mb-3">
                                     <input type="submit" value="更新" class="btn btn-primary">

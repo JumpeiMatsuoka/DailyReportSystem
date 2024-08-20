@@ -10,32 +10,37 @@
     <div class="col-sm-10 mt-3 h-100">
         <!-- コンテンツ -->
         <div class="container">
+            <h1 class="h3 mb-3">日報 更新</h1>
             <div class="card">
-                <div class="card-header">
-                    <h1 class="h3 mb-0">日報 更新</h1>
-                </div>
                 <div class="card-body">
                     <form th:action="@{/reports/{id}/update(id=${report.id})}" th:object="${report}" method="post">
-                        <div class="mb-3">
+                        <div class="form-group">
                             <label for="reportDate" class="form-label">日付</label>
-                            <input type="date" id="reportDate" class="form-control" th:field="*{reportDate}" required>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('reportDate')}" th:errors="*{reportDate}"></div>
+                            <div class="col-md-4">
+                                <input type="date" id="reportDate" class="form-control date-input" th:field="*{reportDate}">
+                                <div class="text-danger" th:if="${#fields.hasErrors('reportDate')}" th:errors="*{reportDate}"></div>
+                                <div class="text-danger" th:if="${reportDateError != null}" th:text="${reportDateError}"></div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">氏名</label>
-                            <p th:text="${report.employee.name}"></p> <!-- 修正 -->
+                        <div class="form-group">
+                            <label for="employeeName" class="form-label">氏名</label>
+                            <span id="employeeName" class="form-control-plaintext" th:text="${report.employee != null ? report.employee.name : ''}"></span>
                         </div>
-                        <div class="mb-3">
+                        <div class="form-group">
                             <label for="title" class="form-label">タイトル</label>
-                            <input type="text" id="title" class="form-control" th:field="*{title}" required maxlength="100">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                            <div class="col-md-6">
+                                <input type="text" id="title" class="form-control title-input" th:field="*{title}" maxlength="200">
+                                <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                                <div class="text-danger" th:if="${titleError != null}" th:text="${titleError}"></div>
+                            </div>
                         </div>
-                        <div class="mb-3">
+                        <div class="form-group">
                             <label for="content" class="form-label">内容</label>
-                            <textarea id="content" class="form-control" th:field="*{content}" rows="5" required maxlength="600"></textarea>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+                            <textarea id="content" class="form-control" th:field="*{content}" rows="5" maxlength="800"></textarea>
+                            <div class="text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+                            <div class="text-danger" th:if="${contentError != null}" th:text="${contentError}"></div>
                         </div>
-                        <div class="d-flex justify-content-start">
+                        <div class="btn-container mt-3">
                             <button type="submit" class="btn btn-primary">更新</button>
                             <a th:href="@{/reports}" class="btn btn-outline-primary">戻る</a>
                         </div>

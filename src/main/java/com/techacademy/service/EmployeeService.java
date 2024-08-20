@@ -115,7 +115,10 @@ public class EmployeeService {
         Employee employee = option.orElse(null);
         return employee;
     }
-
+    // 追加: ユーザー名で検索
+    public Employee findByUsername(String username) {
+        return employeeRepository.findByUsername(username);
+    }
     // 従業員パスワードチェック
     private ErrorKinds employeePasswordCheck(Employee employee) {
 

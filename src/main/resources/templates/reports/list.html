@@ -15,7 +15,7 @@
                 <h1 class="h3 mb-3">日報 一覧</h1>
                 <!-- 日報情報のテーブル -->
                 <div class="row">
-                    <div class="col-xl-12">
+                    <div class="col-xl-11">
                         <div class="card">
                             <div class="card-body">
                                 <table class="table table-striped w-100">
@@ -24,30 +24,27 @@
                                             <th>氏名</th>
                                             <th>日付</th>
                                             <th>タイトル</th>
-                                            <th></th> <!-- 操作カラム用のヘッダー -->
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="report : ${rl}">
-                                            <td class="align-middle" th:text="${report.employee.code}"></td>
-                                            <td class="align-middle"
-                                                th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd')}"></td>
+                                        <tr th:each="report : ${rL}">
+                                            <td class="align-middle" th:text="${report.employee.name}"></td>
+                                            <td class="align-middle" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd')}"></td>
                                             <td class="align-middle" th:text="${report.title}"></td>
                                             <td class="align-middle">
                                                 <!-- 詳細画面へのリンクボタン -->
-                                                <a th:href="@{/reports/{id}/detail(id=${report.id})}"
-                                                    class="btn btn-primary">詳細</a>
+                                                <a th:href="@{/reports/{id}/detail(id=${report.id})}" class="btn btn-primary">詳細</a>
                                             </td>
                                         </tr>
-
                                     </tbody>
                                 </table>
-                                <!-- 件数表示 -->
-                                <p th:text="'全' + ${totalReports} + '件'"></p>
                             </div>
                         </div>
-                        <!-- 新規登録画面へのリンク -->
-                        <a th:href="@{/reports/add}" class="btn btn-primary">登録</a>
+                        <p class="mb-3" th:text="'（ 全' + ${listSize} + '件 ）'"></p>
+                        <div>
+                            <a th:href="@{/reports/add}" class="btn btn-primary">登録</a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -32,16 +32,22 @@ public class ErrorMessage {
                     new ArrayList<String>(Arrays.asList("deleteError", "ログイン中の従業員を削除することは出来ません")));
             // 同一日付チェック用エラーメッセージ
             put(ErrorKinds.DATECHECK_ERROR, new ArrayList<String>(Arrays.asList("reportDateError", "既に登録されている日付です")));
+            // 日付必須チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_DATE_BLANK_ERROR, new ArrayList<String>(Arrays.asList("dateError", "値を入力してください")));
+            // タイトル必須チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_TITLE_BLANK_ERROR, new ArrayList<String>(Arrays.asList("titleError", "値を入力してください")));
+            // タイトル桁数チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_TITLE_SIZE_ERROR, new ArrayList<String>(Arrays.asList("titleError", "100文字以下で入力してください")));
+            // 内容必須チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_CONTENT_BLANK_ERROR, new ArrayList<String>(Arrays.asList("contentError", "値を入力してください")));
+            // 内容桁数チェック用エラーメッセージ
+            put(ErrorKinds.REPORT_CONTENT_SIZE_ERROR, new ArrayList<String>(Arrays.asList("contentError", "600文字以下で入力してください")));
         }
     };
 
     // エラーメッセージマップにあるエラーかどうかのチェック
     public static boolean contains(ErrorKinds errorKinds) {
-        if (errorMessageMap.containsKey(errorKinds)) {
-            return true;
-        } else {
-            return false;
-        }
+        return errorMessageMap.containsKey(errorKinds);
     }
 
     // エラーメッセージの名称を取得
@@ -54,3 +60,4 @@ public class ErrorMessage {
         return errorMessageMap.get(errorKinds).get(1);
     }
 }
+
