@@ -32,16 +32,14 @@
                             <div class="form-group">
                                 <label for="title" class="form-label">タイトル</label>
                                 <div class="col-md-6">
-                                    <input type="text" id="title" class="form-control title-input" th:field="*{title}" maxlength="200">
+                                    <input type="text" id="title" class="form-control title-input" th:field="*{title}" maxlength="100">
                                     <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
-                                    <div class="text-danger" th:if="${titleError != null}" th:text="${titleError}"></div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="content" class="form-label">内容</label>
-                                <textarea id="content" class="form-control" th:field="*{content}" rows="5" maxlength="800"></textarea>
+                                <textarea id="content" class="form-control" th:field="*{content}" rows="5" maxlength="600"></textarea>
                                 <div class="text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
-                                <div class="text-danger" th:if="${contentError != null}" th:text="${contentError}"></div>
                             </div>
                             <div class="btn-container mt-3">
                                 <button type="submit" class="btn btn-primary">登録</button>

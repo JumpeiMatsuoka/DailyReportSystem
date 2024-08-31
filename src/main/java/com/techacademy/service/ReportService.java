@@ -27,17 +27,23 @@ public class ReportService {
     public ErrorKinds save(Report report) {
         LocalDateTime now = LocalDateTime.now();
 
+        // 同じ日付で同じ従業員の日報が既に存在するかチェック
         if (isDuplicateReportDate(report.getEmployee(), report.getReportDate(), report.getId())) {
             return ErrorKinds.DATECHECK_ERROR;
         }
 
         if (report.getId() != null && reportRepository.existsById(report.getId())) {
+            // 既存のレポートがある場合、作成日時を保持し、更新日時を設定
+            Report existingReport = reportRepository.findById(report.getId()).orElseThrow(() -> new IllegalArgumentException("Invalid report Id:" + report.getId()));
+            report.setCreatedAt(existingReport.getCreatedAt());
             report.setUpdatedAt(now);
         } else {
+            // 新規作成の場合、作成日時と更新日時を現在の日時に設定
             report.setCreatedAt(now);
             report.setUpdatedAt(now);
             report.setDeleteFlg(false);
         }
+
         reportRepository.save(report);
         return ErrorKinds.SUCCESS;
     }
@@ -67,11 +73,12 @@ public class ReportService {
         return reportRepository.findById(id);
     }
 
+    // 特定の従業員と日付に一致し、指定したIDを除く日報が存在するか確認するメソッド
     public boolean isDuplicateReportDate(Employee employee, LocalDate reportDate, Long excludeId) {
-        return reportRepository.existsByEmployeeAndReportDateAndIdNotAndDeleteFlgFalse(employee, reportDate, excludeId);
-    }
-
-    public boolean existsByEmployeeAndDate(Employee employee, LocalDate date, Long excludeId) {
-        return reportRepository.existsByEmployeeAndReportDateAndIdNotAndDeleteFlgFalse(employee, date, excludeId);
+        if (excludeId == null) {
+            return reportRepository.existsByEmployeeAndReportDateAndDeleteFlgFalse(employee, reportDate);
+        } else {
+            return reportRepository.existsByEmployeeAndReportDateAndIdNotAndDeleteFlgFalse(employee, reportDate, excludeId);
+        }
     }
 }

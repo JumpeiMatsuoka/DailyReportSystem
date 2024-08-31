@@ -85,8 +85,9 @@ public class ReportController {
             return "reports/new";
         }
 
+        // 同じ日付で同じ従業員が既に日報を登録しているかチェック
         if (reportService.isDuplicateReportDate(userDetail.getEmployee(), report.getReportDate(), null)) {
-            model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DATECHECK_ERROR), ErrorMessage.getErrorValue(ErrorKinds.DATECHECK_ERROR));
+            model.addAttribute("reportDateError", "既に登録されている日付です");
             report.setEmployee(userDetail.getEmployee());
             model.addAttribute("report", report);
             return "reports/new";
@@ -97,7 +98,7 @@ public class ReportController {
         return "redirect:/reports";
     }
 
- // 日報詳細画面表示
+    // 日報詳細画面表示
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         reportService.findById(id).ifPresent(report -> model.addAttribute("report", report));
@@ -132,14 +133,19 @@ public class ReportController {
             return "reports/update";
         }
 
-        if (reportService.existsByEmployeeAndDate(userDetail.getEmployee(), report.getReportDate(), id)) {
-            model.addAttribute(ErrorMessage.getErrorName(ErrorKinds.DATECHECK_ERROR), ErrorMessage.getErrorValue(ErrorKinds.DATECHECK_ERROR));
+        // 更新時も同様のチェックを行うが、同一レコードのチェックは無視する
+        if (reportService.isDuplicateReportDate(userDetail.getEmployee(), report.getReportDate(), id)) {
+            model.addAttribute("reportDateError", "既に登録されている日付です");
             report.setEmployee(userDetail.getEmployee());
             model.addAttribute("report", report);
             return "reports/update";
         }
 
-        report.setId(id);
+        // 既存のcreated_atを保持
+        Report existingReport = reportService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid report Id:" + id));
+        report.setCreatedAt(existingReport.getCreatedAt());
+
+        report.setEmployee(userDetail.getEmployee());
         reportService.save(report);
         return "redirect:/reports";
     }
