@@ -34,13 +34,13 @@ public class Report {
     private LocalDate reportDate;
 
     @NotEmpty(message = "{jakarta.validation.constraints.NotEmpty.message}")
-    @Length(max = 100, message = "{org.hibernate.validator.constraints.Length.message}")
+    @Length(max = 100, message = "100文字以下で入力してください")
     @Column(name = "title", nullable = false, length = 100)
     private String title;
 
     @NotEmpty(message = "{jakarta.validation.constraints.NotEmpty.message}")
-    @Length(max = 600, message = "{org.hibernate.validator.constraints.Length.message}")
-    @Column(name = "content", nullable = false)
+    @Length(max = 600, message = "600文字以下で入力してください")
+    @Column(name = "content", nullable = false, length = 600)
     private String content;
 
     @Column(name = "delete_flg", nullable = false)

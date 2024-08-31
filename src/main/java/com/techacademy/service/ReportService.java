@@ -32,14 +32,15 @@ public class ReportService {
             return ErrorKinds.DATECHECK_ERROR;
         }
 
+        // 新規登録か更新かを判定し、適切な日時を設定
         if (report.getId() != null && reportRepository.existsById(report.getId())) {
-            // 既存のレポートがある場合、作成日時を保持し、更新日時を設定
-            Report existingReport = reportRepository.findById(report.getId()).orElseThrow(() -> new IllegalArgumentException("Invalid report Id:" + report.getId()));
-            report.setCreatedAt(existingReport.getCreatedAt());
+            // 更新時に created_at が null の場合、エラーを防ぐための対応
+            if (report.getCreatedAt() == null) {
+                report.setCreatedAt(now); // ここで作成日時をセット
+            }
             report.setUpdatedAt(now);
         } else {
-            // 新規作成の場合、作成日時と更新日時を現在の日時に設定
-            report.setCreatedAt(now);
+            report.setCreatedAt(now); // 新規作成時に作成日時をセット
             report.setUpdatedAt(now);
             report.setDeleteFlg(false);
         }

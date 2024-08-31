@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Employee;
 import com.techacademy.repository.EmployeeRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmployeeService {
@@ -30,8 +30,7 @@ public class EmployeeService {
     // 従業員保存
     @Transactional
     public ErrorKinds save(Employee employee) {
-
-     // パスワードチェック
+        // パスワードチェック
         ErrorKinds result = employeePasswordCheck(employee);
         if (ErrorKinds.CHECK_OK != result) {
             return result;
@@ -47,11 +46,12 @@ public class EmployeeService {
         LocalDateTime now = LocalDateTime.now();
         employee.setCreatedAt(now);
         employee.setUpdatedAt(now);
-        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));  // パスワードを暗号化
         employeeRepository.save(employee);
         return ErrorKinds.SUCCESS;
     }
 
+    // 従業員更新
     @Transactional
     public ErrorKinds update(Employee employee) {
         // 氏名の必須チェック
@@ -69,36 +69,38 @@ public class EmployeeService {
 
         Employee existingEmployee = existingEmployeeOpt.get();
 
-     // パスワードが空でない場合のみチェックして更新
+        // パスワードが空でない場合のみチェックして更新
         if (employee.getPassword() != null && !employee.getPassword().isEmpty()) {
             ErrorKinds passwordResult = employeePasswordCheck(employee);
             if (passwordResult != ErrorKinds.CHECK_OK) {
                 return passwordResult;
             }
-            existingEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));
+            existingEmployee.setPassword(passwordEncoder.encode(employee.getPassword()));  // パスワードを暗号化
         }
+
         // ここでパスワードが空の場合でも、その他の情報は更新される
         existingEmployee.setName(employee.getName());
         existingEmployee.setRole(employee.getRole());
         existingEmployee.setUpdatedAt(LocalDateTime.now());
 
         employeeRepository.save(existingEmployee); // 更新処理を実行
-        return ErrorKinds.SUCCESS; // 更新に成功したらSUCCESSを返す
+        return ErrorKinds.SUCCESS;
     }
 
     // 従業員削除
     @Transactional
     public ErrorKinds delete(String code, UserDetail userDetail) {
-
         // 自分を削除しようとした場合はエラーメッセージを表示
         if (code.equals(userDetail.getEmployee().getCode())) {
             return ErrorKinds.LOGINCHECK_ERROR;
         }
+
         Employee employee = findByCode(code);
         LocalDateTime now = LocalDateTime.now();
         employee.setUpdatedAt(now);
         employee.setDeleteFlg(true);
 
+        employeeRepository.save(employee);
         return ErrorKinds.SUCCESS;
     }
 
@@ -118,27 +120,21 @@ public class EmployeeService {
 
     // 従業員パスワードチェック
     private ErrorKinds employeePasswordCheck(Employee employee) {
-
         // 従業員パスワードの半角英数字チェック処理
         if (isHalfSizeCheckError(employee)) {
-
             return ErrorKinds.HALFSIZE_ERROR;
         }
 
         // 従業員パスワードの8文字～16文字チェック処理
         if (isOutOfRangePassword(employee)) {
-
             return ErrorKinds.RANGECHECK_ERROR;
         }
-
-        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
 
         return ErrorKinds.CHECK_OK;
     }
 
     // 従業員パスワードの半角英数字チェック処理
     private boolean isHalfSizeCheckError(Employee employee) {
-
         // 半角英数字チェック
         Pattern pattern = Pattern.compile("^[A-Za-z0-9]+$");
         Matcher matcher = pattern.matcher(employee.getPassword());
@@ -146,11 +142,9 @@ public class EmployeeService {
     }
 
     // 従業員パスワードの8文字～16文字チェック処理
-    public boolean isOutOfRangePassword(Employee employee) {
-
+    private boolean isOutOfRangePassword(Employee employee) {
         // 桁数チェック
         int passwordLength = employee.getPassword().length();
         return passwordLength < 8 || 16 < passwordLength;
     }
-
 }

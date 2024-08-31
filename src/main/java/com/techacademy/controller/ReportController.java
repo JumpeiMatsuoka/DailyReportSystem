@@ -1,7 +1,5 @@
 package com.techacademy.controller;
 
-import com.techacademy.constants.ErrorKinds;
-import com.techacademy.constants.ErrorMessage;
 import com.techacademy.entity.Report;
 import com.techacademy.service.ReportService;
 import com.techacademy.service.UserDetail;
@@ -12,7 +10,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,10 +59,7 @@ public class ReportController {
     public String add(@AuthenticationPrincipal UserDetail userDetail, Model model) {
         Report report = new Report();
         report.setEmployee(userDetail.getEmployee());
-
-        // ここで現在の日付を設定
         report.setReportDate(LocalDate.now());
-
         model.addAttribute("report", report);
         return "reports/new";
     }
@@ -74,13 +68,7 @@ public class ReportController {
     @PostMapping("/add")
     public String create(@AuthenticationPrincipal UserDetail userDetail, @Valid @ModelAttribute("report") Report report, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            report.setEmployee(userDetail.getEmployee());
-            bindingResult.getFieldErrors().forEach(error -> {
-                ErrorKinds errorKind = determineErrorKind(error);
-                if (ErrorMessage.contains(errorKind)) {
-                    model.addAttribute(ErrorMessage.getErrorName(errorKind), ErrorMessage.getErrorValue(errorKind));
-                }
-            });
+            // エラーメッセージを個別のフィールドごとに設定する
             model.addAttribute("report", report);
             return "reports/new";
         }
@@ -88,7 +76,6 @@ public class ReportController {
         // 同じ日付で同じ従業員が既に日報を登録しているかチェック
         if (reportService.isDuplicateReportDate(userDetail.getEmployee(), report.getReportDate(), null)) {
             model.addAttribute("reportDateError", "既に登録されている日付です");
-            report.setEmployee(userDetail.getEmployee());
             model.addAttribute("report", report);
             return "reports/new";
         }
@@ -124,10 +111,7 @@ public class ReportController {
         if (bindingResult.hasErrors()) {
             report.setEmployee(userDetail.getEmployee());
             bindingResult.getFieldErrors().forEach(error -> {
-                ErrorKinds errorKind = determineErrorKind(error);
-                if (ErrorMessage.contains(errorKind)) {
-                    model.addAttribute(ErrorMessage.getErrorName(errorKind), ErrorMessage.getErrorValue(errorKind));
-                }
+                model.addAttribute(error.getField() + "Error", error.getDefaultMessage());
             });
             model.addAttribute("report", report);
             return "reports/update";
@@ -141,11 +125,16 @@ public class ReportController {
             return "reports/update";
         }
 
-        // 既存のcreated_atを保持
-        Report existingReport = reportService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid report Id:" + id));
-        report.setCreatedAt(existingReport.getCreatedAt());
+        // report IDを利用して、created_atの値を取得し、nullでないか確認
+        Report existingReport = reportService.findById(id).orElse(null);
+        if (existingReport != null) {
+            report.setCreatedAt(existingReport.getCreatedAt());
+            report.setEmployee(existingReport.getEmployee()); // ここでemployeeをセット
+        } else {
+            report.setEmployee(userDetail.getEmployee()); // 新しいデータの場合、ログインユーザーをセット
+        }
 
-        report.setEmployee(userDetail.getEmployee());
+        report.setId(id);
         reportService.save(report);
         return "redirect:/reports";
     }
@@ -155,32 +144,5 @@ public class ReportController {
     public String delete(@PathVariable Long id) {
         reportService.delete(id);
         return "redirect:/reports";
-    }
-
-    private ErrorKinds determineErrorKind(FieldError error) {
-        switch (error.getField()) {
-            case "reportDate":
-                if (error.getCode().equals("NotBlank")) {
-                    return ErrorKinds.REPORT_DATE_BLANK_ERROR;
-                }
-                break;
-            case "title":
-                if (error.getCode().equals("NotBlank")) {
-                    return ErrorKinds.REPORT_TITLE_BLANK_ERROR;
-                } else if (error.getCode().equals("Size")) {
-                    return ErrorKinds.REPORT_TITLE_SIZE_ERROR;
-                }
-                break;
-            case "content":
-                if (error.getCode().equals("NotBlank")) {
-                    return ErrorKinds.REPORT_CONTENT_BLANK_ERROR;
-                } else if (error.getCode().equals("Size")) {
-                    return ErrorKinds.REPORT_CONTENT_SIZE_ERROR;
-                }
-                break;
-            default:
-                return null;
-        }
-        return null;
     }
 }
