@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +29,7 @@ public class Report {
     private Long id;
 
     @NotNull(message = "{jakarta.validation.constraints.NotNull.message}")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")  // 追加: フォームからの日付文字列をLocalDateに変換
     @Column(name = "report_date", nullable = false)
     private LocalDate reportDate;
 

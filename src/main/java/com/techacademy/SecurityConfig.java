@@ -10,19 +10,29 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.formLogin(login -> login.loginProcessingUrl("/login")
+        http
+            .formLogin(login -> login
+                .loginProcessingUrl("/login")
                 .loginPage("/login")
                 .defaultSuccessUrl("/")
                 .failureUrl("/login?error")
                 .permitAll()
-        ).logout(logout -> logout.logoutSuccessUrl("/login")
-        ).authorizeHttpRequests(auth -> auth
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers("/employees/**").hasAuthority("ROLE_ADMIN") // ここが重要
-                .anyRequest().authenticated()
-        );
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/login")
+                .permitAll()
+            )
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // 静的リソースへのアクセス許可
+                .requestMatchers("/employees/**").hasAuthority("ROLE_ADMIN") // 管理者のみアクセス許可
+                .anyRequest().authenticated() // その他のリクエストは認証を要求
+            )
+            .exceptionHandling(exception -> exception
+                .accessDeniedPage("/403") // 403エラーページの設定
+            );
 
         return http.build();
     }
@@ -32,3 +42,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

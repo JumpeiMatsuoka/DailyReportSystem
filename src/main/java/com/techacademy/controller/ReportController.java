@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,10 @@ public class ReportController {
     public String add(@AuthenticationPrincipal UserDetail userDetail, Model model) {
         Report report = new Report();
         report.setEmployee(userDetail.getEmployee());
+
+        // ここで現在の日付を設定
+        report.setReportDate(LocalDate.now());
+
         model.addAttribute("report", report);
         return "reports/new";
     }
@@ -92,8 +97,8 @@ public class ReportController {
         return "redirect:/reports";
     }
 
-    // 日報詳細画面表示
-    @GetMapping("/{id}/detail")
+ // 日報詳細画面表示
+    @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         reportService.findById(id).ifPresent(report -> model.addAttribute("report", report));
         return "reports/detail";
@@ -102,7 +107,13 @@ public class ReportController {
     // 日報更新画面表示
     @GetMapping("/{id}/update")
     public String edit(@PathVariable Long id, Model model) {
-        reportService.findById(id).ifPresent(report -> model.addAttribute("report", report));
+        reportService.findById(id).ifPresent(report -> {
+            // ここで日付がnullであれば、現在の日付を設定
+            if (report.getReportDate() == null) {
+                report.setReportDate(LocalDate.now());
+            }
+            model.addAttribute("report", report);
+        });
         return "reports/update";
     }
 

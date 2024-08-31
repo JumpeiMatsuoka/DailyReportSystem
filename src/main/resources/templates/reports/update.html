@@ -37,7 +37,7 @@
                         <div class="form-group">
                             <label for="content" class="form-label">内容</label>
                             <textarea id="content" class="form-control" th:field="*{content}" rows="5" maxlength="800"></textarea>
-                            <div class="text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+                            <div class="text-danger" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></textarea>
                             <div class="text-danger" th:if="${contentError != null}" th:text="${contentError}"></div>
                         </div>
                         <div class="btn-container mt-3">

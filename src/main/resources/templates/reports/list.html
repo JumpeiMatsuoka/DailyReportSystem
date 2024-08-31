@@ -34,7 +34,7 @@
                                             <td class="align-middle" th:text="${report.title}"></td>
                                             <td class="align-middle">
                                                 <!-- 詳細画面へのリンクボタン -->
-                                                <a th:href="@{/reports/{id}/detail(id=${report.id})}" class="btn btn-primary">詳細</a>
+                                                <a th:href="@{/reports/{id}(id=${report.id})}" class="btn btn-primary">詳細</a>
                                             </td>
                                         </tr>
                                     </tbody>

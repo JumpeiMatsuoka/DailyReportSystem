@@ -45,13 +45,6 @@ public class Employee {
     @Length(max = 10)
     private String code;
 
-    // ユーザー名
-    @Column(length = 50, nullable = false, unique = true)
-    @NotEmpty
-    @Length(max = 50)
-    private String username;
-
-
     // 名前
     @Column(length = 20, nullable = false)
     @NotEmpty
